@@ -1,0 +1,63 @@
+name: GuestQR CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  api:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hotel/services/api
+    env:
+      NODE_ENV: test
+      DATABASE_URL: postgres://localhost:5432/guestqr
+      JWT_ACCESS_SECRET: test-access-secret-that-is-long-enough-123
+      JWT_REFRESH_SECRET: test-refresh-secret-that-is-long-enough-123
+      JWT_GUEST_SECRET: test-guest-secret-that-is-long-enough-123
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: hotel/services/api/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm test
+      - run: npm audit --audit-level=high
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hotel
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: hotel/package-lock.json
+      - run: npm ci
+      - run: npm run build
+
+  flutter:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: hotel/staff_app
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.0'
+          channel: stable
+      - run: flutter pub get
+      - run: flutter analyze
+      - run: flutter test

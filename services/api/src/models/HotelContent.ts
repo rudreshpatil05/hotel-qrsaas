@@ -1,0 +1,7 @@
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
+import { sequelize } from '../db.js';
+export const CONTENT_TYPES = ['HOTEL_INFORMATION', 'FACILITY', 'RESTAURANT', 'SPA', 'POOL', 'GYM', 'RULE', 'TIMING', 'PRICING', 'EMERGENCY_CONTACT'] as const;
+export class HotelContent extends Model<InferAttributes<HotelContent>, InferCreationAttributes<HotelContent>> {
+  declare id: CreationOptional<string>; declare hotelId: string; declare type: typeof CONTENT_TYPES[number]; declare slug: string; declare translations: object; declare active: boolean; declare sortOrder: number; declare createdAt: CreationOptional<Date>; declare updatedAt: CreationOptional<Date>;
+}
+HotelContent.init({ id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true }, hotelId: { type: DataTypes.UUID, allowNull: false }, type: { type: DataTypes.ENUM(...CONTENT_TYPES), allowNull: false }, slug: { type: DataTypes.STRING(100), allowNull: false }, translations: { type: DataTypes.JSONB, allowNull: false }, active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true }, sortOrder: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 }, createdAt: DataTypes.DATE, updatedAt: DataTypes.DATE }, { sequelize, tableName: 'hotel_content', indexes: [{ unique: true, fields: ['hotelId', 'slug'] }, { fields: ['hotelId', 'type', 'active'] }] });

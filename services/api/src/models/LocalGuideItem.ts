@@ -1,0 +1,7 @@
+import { CreationOptional, DataTypes, InferAttributes, InferCreationAttributes, Model } from 'sequelize';
+import { sequelize } from '../db.js';
+export const GUIDE_TYPES = ['ATTRACTION', 'RESTAURANT', 'SHOPPING', 'TRANSPORT', 'EVENT'] as const;
+export class LocalGuideItem extends Model<InferAttributes<LocalGuideItem>, InferCreationAttributes<LocalGuideItem>> {
+  declare id: CreationOptional<string>; declare hotelId: string; declare type: typeof GUIDE_TYPES[number]; declare slug: string; declare translations: object; declare location: object | null; declare active: boolean; declare sortOrder: number; declare createdAt: CreationOptional<Date>; declare updatedAt: CreationOptional<Date>;
+}
+LocalGuideItem.init({ id: { type: DataTypes.UUID, defaultValue: DataTypes.UUIDV4, primaryKey: true }, hotelId: { type: DataTypes.UUID, allowNull: false }, type: { type: DataTypes.ENUM(...GUIDE_TYPES), allowNull: false }, slug: { type: DataTypes.STRING(100), allowNull: false }, translations: { type: DataTypes.JSONB, allowNull: false }, location: { type: DataTypes.JSONB, allowNull: true }, active: { type: DataTypes.BOOLEAN, allowNull: false, defaultValue: true }, sortOrder: { type: DataTypes.INTEGER, allowNull: false, defaultValue: 0 }, createdAt: DataTypes.DATE, updatedAt: DataTypes.DATE }, { sequelize, tableName: 'local_guide_items', indexes: [{ unique: true, fields: ['hotelId', 'slug'] }, { fields: ['hotelId', 'type', 'active'] }] });
